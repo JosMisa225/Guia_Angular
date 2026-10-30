@@ -25,6 +25,8 @@ export class LibroComponent {
   autor = '';
   anio: number | null = null;
 
+  indiceEditar = -1;
+
   constructor(private router: Router) {
     if (localStorage.getItem('sesionBiblioteca') !== 'si') {
       this.router.navigate(['/login']);
@@ -41,8 +43,15 @@ export class LibroComponent {
     this.router.navigate(['/login']);
   }
 
+  editar(indice: number) {
+    this.indiceEditar = indice;
+    this.codigo = this.libros[indice].codigo;
+    this.titulo = this.libros[indice].titulo;
+    this.autor = this.libros[indice].autor;
+    this.anio = this.libros[indice].anio;
+  }
+
   guardar() {
-    // Validaciones
     if (
       this.codigo.trim() === '' ||
       this.titulo.trim() === '' ||
@@ -58,23 +67,32 @@ export class LibroComponent {
       return;
     }
 
-    // ID automático
-    let nuevoId = 1;
-    for (const libro of this.libros) {
-      if (libro.id >= nuevoId) {
-        nuevoId = libro.id + 1;
+    if (this.indiceEditar === -1) {
+      // Crear
+      let nuevoId = 1;
+      for (const libro of this.libros) {
+        if (libro.id >= nuevoId) {
+          nuevoId = libro.id + 1;
+        }
       }
+
+      const nuevoLibro: Libro = {
+        id: nuevoId,
+        codigo: this.codigo.trim(),
+        titulo: this.titulo.trim(),
+        autor: this.autor.trim(),
+        anio: Number(this.anio)
+      };
+
+      this.libros.push(nuevoLibro);
+    } else {
+      // Actualizar
+      this.libros[this.indiceEditar].codigo = this.codigo.trim();
+      this.libros[this.indiceEditar].titulo = this.titulo.trim();
+      this.libros[this.indiceEditar].autor = this.autor.trim();
+      this.libros[this.indiceEditar].anio = Number(this.anio);
     }
 
-    const nuevoLibro: Libro = {
-      id: nuevoId,
-      codigo: this.codigo.trim(),
-      titulo: this.titulo.trim(),
-      autor: this.autor.trim(),
-      anio: Number(this.anio)
-    };
-
-    this.libros.push(nuevoLibro);
     this.guardarEnLocalStorage();
     this.limpiar();
   }
@@ -84,6 +102,7 @@ export class LibroComponent {
     this.titulo = '';
     this.autor = '';
     this.anio = null;
+    this.indiceEditar = -1;
   }
 
   guardarEnLocalStorage() {

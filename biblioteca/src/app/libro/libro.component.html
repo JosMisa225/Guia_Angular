@@ -2,7 +2,12 @@
   <h1>Catálogo de Libros</h1>
   <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
 
-  <h2>Registrar libro</h2>
+  @if (indiceEditar === -1) {
+    <h2>Registrar libro</h2>
+  } @else {
+    <h2>Editar libro</h2>
+  }
+
   <form (ngSubmit)="guardar()">
     <label for="codigo">Código</label>
     <input id="codigo" name="codigo" type="text" [(ngModel)]="codigo" required>
@@ -16,8 +21,13 @@
     <label for="anio">Año</label>
     <input id="anio" name="anio" type="number" [(ngModel)]="anio" required>
 
-    <button type="submit">Guardar</button>
-    <button type="button" (click)="limpiar()">Limpiar</button>
+    @if (indiceEditar === -1) {
+      <button type="submit">Guardar</button>
+      <button type="button" (click)="limpiar()">Limpiar</button>
+    } @else {
+      <button type="submit">Actualizar</button>
+      <button type="button" (click)="limpiar()">Cancelar</button>
+    }
   </form>
 
   <h2>Libros registrados</h2>
@@ -35,16 +45,20 @@
             <th>Título</th>
             <th>Autor</th>
             <th>Año</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          @for (libro of libros; track libro.id) {
+          @for (libro of libros; track libro.id; let i = $index) {
             <tr>
               <td>{{ libro.id }}</td>
               <td>{{ libro.codigo }}</td>
               <td>{{ libro.titulo }}</td>
               <td>{{ libro.autor }}</td>
               <td>{{ libro.anio }}</td>
+              <td>
+                <button type="button" (click)="editar(i)">Editar</button>
+              </td>
             </tr>
           }
         </tbody>
