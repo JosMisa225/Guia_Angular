@@ -95,6 +95,14 @@ export class MascotaComponent {
     this.limpiar();
   }
 
+  eliminar(indice: number) {
+    if (confirm('¿Desea eliminar esta mascota del registro?')) {
+      this.mascotas.splice(indice, 1);
+      this.guardarEnLocalStorage();
+      this.limpiar();
+    }
+  }
+
   limpiar() {
     this.nombre = '';
     this.especie = '';
