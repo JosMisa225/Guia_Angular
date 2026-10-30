@@ -25,6 +25,8 @@ export class TareaComponent {
   fechaLimite = '';
   estado = 'Pendiente';
 
+  indiceEditar = -1;
+
   constructor(private router: Router) {
     if (localStorage.getItem('sesionTareas') !== 'si') {
       this.router.navigate(['/login']);
@@ -41,6 +43,14 @@ export class TareaComponent {
     this.router.navigate(['/login']);
   }
 
+  editar(indice: number) {
+    this.indiceEditar = indice;
+    this.titulo = this.tareas[indice].titulo;
+    this.descripcion = this.tareas[indice].descripcion;
+    this.fechaLimite = this.tareas[indice].fechaLimite;
+    this.estado = this.tareas[indice].estado;
+  }
+
   guardar() {
     if (
       this.titulo.trim() === '' ||
@@ -52,22 +62,30 @@ export class TareaComponent {
       return;
     }
 
-    let nuevoId = 1;
-    for (const tarea of this.tareas) {
-      if (tarea.id >= nuevoId) {
-        nuevoId = tarea.id + 1;
+    if (this.indiceEditar === -1) {
+      let nuevoId = 1;
+      for (const tarea of this.tareas) {
+        if (tarea.id >= nuevoId) {
+          nuevoId = tarea.id + 1;
+        }
       }
+
+      const nuevaTarea: Tarea = {
+        id: nuevoId,
+        titulo: this.titulo.trim(),
+        descripcion: this.descripcion.trim(),
+        fechaLimite: this.fechaLimite,
+        estado: this.estado
+      };
+
+      this.tareas.push(nuevaTarea);
+    } else {
+      this.tareas[this.indiceEditar].titulo = this.titulo.trim();
+      this.tareas[this.indiceEditar].descripcion = this.descripcion.trim();
+      this.tareas[this.indiceEditar].fechaLimite = this.fechaLimite;
+      this.tareas[this.indiceEditar].estado = this.estado;
     }
 
-    const nuevaTarea: Tarea = {
-      id: nuevoId,
-      titulo: this.titulo.trim(),
-      descripcion: this.descripcion.trim(),
-      fechaLimite: this.fechaLimite,
-      estado: this.estado
-    };
-
-    this.tareas.push(nuevaTarea);
     this.guardarEnLocalStorage();
     this.limpiar();
   }
@@ -77,6 +95,7 @@ export class TareaComponent {
     this.descripcion = '';
     this.fechaLimite = '';
     this.estado = 'Pendiente';
+    this.indiceEditar = -1;
   }
 
   guardarEnLocalStorage() {
