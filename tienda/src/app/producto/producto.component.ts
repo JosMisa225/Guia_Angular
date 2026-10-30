@@ -100,6 +100,14 @@ export class ProductoComponent {
     this.limpiar();
   }
 
+  eliminar(indice: number) {
+    if (confirm('¿Desea eliminar este producto del inventario?')) {
+      this.productos.splice(indice, 1);
+      this.guardarEnLocalStorage();
+      this.limpiar();
+    }
+  }
+
   limpiar() {
     this.codigo = '';
     this.nombre = '';
