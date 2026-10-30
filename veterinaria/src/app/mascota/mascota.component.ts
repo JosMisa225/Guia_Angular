@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 interface Mascota {
   id: number;
@@ -11,12 +12,18 @@ interface Mascota {
 
 @Component({
   selector: 'app-mascota',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './mascota.component.html',
   styleUrl: './mascota.component.css'
 })
 export class MascotaComponent {
   mascotas: Mascota[] = [];
+
+  // Formulario
+  nombre = '';
+  especie = '';
+  edad: number | null = null;
+  propietario = '';
 
   constructor(private router: Router) {
     if (localStorage.getItem('sesionVeterinaria') !== 'si') {
@@ -32,5 +39,52 @@ export class MascotaComponent {
   cerrarSesion() {
     localStorage.removeItem('sesionVeterinaria');
     this.router.navigate(['/login']);
+  }
+
+  guardar() {
+    if (
+      this.nombre.trim() === '' ||
+      this.especie.trim() === '' ||
+      this.edad === null ||
+      this.propietario.trim() === ''
+    ) {
+      alert('Complete todos los campos obligatorios.');
+      return;
+    }
+
+    if (!Number.isInteger(this.edad) || this.edad < 0) {
+      alert('La edad debe ser un número entero mayor o igual a cero.');
+      return;
+    }
+
+    let nuevoId = 1;
+    for (const mascota of this.mascotas) {
+      if (mascota.id >= nuevoId) {
+        nuevoId = mascota.id + 1;
+      }
+    }
+
+    const nuevaMascota: Mascota = {
+      id: nuevoId,
+      nombre: this.nombre.trim(),
+      especie: this.especie.trim(),
+      edad: Number(this.edad),
+      propietario: this.propietario.trim()
+    };
+
+    this.mascotas.push(nuevaMascota);
+    this.guardarEnLocalStorage();
+    this.limpiar();
+  }
+
+  limpiar() {
+    this.nombre = '';
+    this.especie = '';
+    this.edad = null;
+    this.propietario = '';
+  }
+
+  guardarEnLocalStorage() {
+    localStorage.setItem('mascotasVeterinaria', JSON.stringify(this.mascotas));
   }
 }
