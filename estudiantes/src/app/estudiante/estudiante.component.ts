@@ -25,6 +25,8 @@ export class EstudianteComponent {
   carrera = '';
   fechaIngreso = '';
 
+  indiceEditar = -1;
+
   constructor(private router: Router) {
     if (localStorage.getItem('sesionEstudiantes') !== 'si') {
       this.router.navigate(['/login']);
@@ -41,6 +43,14 @@ export class EstudianteComponent {
     this.router.navigate(['/login']);
   }
 
+  editar(indice: number) {
+    this.indiceEditar = indice;
+    this.cuenta = this.estudiantes[indice].cuenta;
+    this.nombre = this.estudiantes[indice].nombre;
+    this.carrera = this.estudiantes[indice].carrera;
+    this.fechaIngreso = this.estudiantes[indice].fechaIngreso;
+  }
+
   guardar() {
     if (
       this.cuenta.trim() === '' ||
@@ -52,24 +62,40 @@ export class EstudianteComponent {
       return;
     }
 
-    let nuevoId = 1;
-    for (const estudiante of this.estudiantes) {
-      if (estudiante.id >= nuevoId) {
-        nuevoId = estudiante.id + 1;
+    if (this.indiceEditar === -1) {
+      let nuevoId = 1;
+      for (const estudiante of this.estudiantes) {
+        if (estudiante.id >= nuevoId) {
+          nuevoId = estudiante.id + 1;
+        }
       }
+
+      const nuevoEstudiante: Estudiante = {
+        id: nuevoId,
+        cuenta: this.cuenta.trim(),
+        nombre: this.nombre.trim(),
+        carrera: this.carrera.trim(),
+        fechaIngreso: this.fechaIngreso
+      };
+
+      this.estudiantes.push(nuevoEstudiante);
+    } else {
+      this.estudiantes[this.indiceEditar].cuenta = this.cuenta.trim();
+      this.estudiantes[this.indiceEditar].nombre = this.nombre.trim();
+      this.estudiantes[this.indiceEditar].carrera = this.carrera.trim();
+      this.estudiantes[this.indiceEditar].fechaIngreso = this.fechaIngreso;
     }
 
-    const nuevoEstudiante: Estudiante = {
-      id: nuevoId,
-      cuenta: this.cuenta.trim(),
-      nombre: this.nombre.trim(),
-      carrera: this.carrera.trim(),
-      fechaIngreso: this.fechaIngreso
-    };
-
-    this.estudiantes.push(nuevoEstudiante);
     this.guardarEnLocalStorage();
     this.limpiar();
+  }
+
+  eliminar(indice: number) {
+    if (confirm('¿Desea eliminar este estudiante del registro?')) {
+      this.estudiantes.splice(indice, 1);
+      this.guardarEnLocalStorage();
+      this.limpiar();
+    }
   }
 
   limpiar() {
@@ -77,6 +103,7 @@ export class EstudianteComponent {
     this.nombre = '';
     this.carrera = '';
     this.fechaIngreso = '';
+    this.indiceEditar = -1;
   }
 
   guardarEnLocalStorage() {
