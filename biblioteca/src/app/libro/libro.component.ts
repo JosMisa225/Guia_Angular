@@ -68,7 +68,6 @@ export class LibroComponent {
     }
 
     if (this.indiceEditar === -1) {
-      // Crear
       let nuevoId = 1;
       for (const libro of this.libros) {
         if (libro.id >= nuevoId) {
@@ -86,7 +85,6 @@ export class LibroComponent {
 
       this.libros.push(nuevoLibro);
     } else {
-      // Actualizar
       this.libros[this.indiceEditar].codigo = this.codigo.trim();
       this.libros[this.indiceEditar].titulo = this.titulo.trim();
       this.libros[this.indiceEditar].autor = this.autor.trim();
@@ -95,6 +93,14 @@ export class LibroComponent {
 
     this.guardarEnLocalStorage();
     this.limpiar();
+  }
+
+  eliminar(indice: number) {
+    if (confirm('¿Desea eliminar este libro del catálogo?')) {
+      this.libros.splice(indice, 1);
+      this.guardarEnLocalStorage();
+      this.limpiar();
+    }
   }
 
   limpiar() {
