@@ -25,6 +25,8 @@ export class ProductoComponent {
   precio: number | null = null;
   existencias: number | null = null;
 
+  indiceEditar = -1;
+
   constructor(private router: Router) {
     if (localStorage.getItem('sesionTienda') !== 'si') {
       this.router.navigate(['/login']);
@@ -39,6 +41,14 @@ export class ProductoComponent {
   cerrarSesion() {
     localStorage.removeItem('sesionTienda');
     this.router.navigate(['/login']);
+  }
+
+  editar(indice: number) {
+    this.indiceEditar = indice;
+    this.codigo = this.productos[indice].codigo;
+    this.nombre = this.productos[indice].nombre;
+    this.precio = this.productos[indice].precio;
+    this.existencias = this.productos[indice].existencias;
   }
 
   guardar() {
@@ -62,22 +72,30 @@ export class ProductoComponent {
       return;
     }
 
-    let nuevoId = 1;
-    for (const producto of this.productos) {
-      if (producto.id >= nuevoId) {
-        nuevoId = producto.id + 1;
+    if (this.indiceEditar === -1) {
+      let nuevoId = 1;
+      for (const producto of this.productos) {
+        if (producto.id >= nuevoId) {
+          nuevoId = producto.id + 1;
+        }
       }
+
+      const nuevoProducto: Producto = {
+        id: nuevoId,
+        codigo: this.codigo.trim(),
+        nombre: this.nombre.trim(),
+        precio: Number(this.precio),
+        existencias: Number(this.existencias)
+      };
+
+      this.productos.push(nuevoProducto);
+    } else {
+      this.productos[this.indiceEditar].codigo = this.codigo.trim();
+      this.productos[this.indiceEditar].nombre = this.nombre.trim();
+      this.productos[this.indiceEditar].precio = Number(this.precio);
+      this.productos[this.indiceEditar].existencias = Number(this.existencias);
     }
 
-    const nuevoProducto: Producto = {
-      id: nuevoId,
-      codigo: this.codigo.trim(),
-      nombre: this.nombre.trim(),
-      precio: Number(this.precio),
-      existencias: Number(this.existencias)
-    };
-
-    this.productos.push(nuevoProducto);
     this.guardarEnLocalStorage();
     this.limpiar();
   }
@@ -87,6 +105,7 @@ export class ProductoComponent {
     this.nombre = '';
     this.precio = null;
     this.existencias = null;
+    this.indiceEditar = -1;
   }
 
   guardarEnLocalStorage() {
