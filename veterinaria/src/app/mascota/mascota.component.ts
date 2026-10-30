@@ -25,6 +25,8 @@ export class MascotaComponent {
   edad: number | null = null;
   propietario = '';
 
+  indiceEditar = -1;
+
   constructor(private router: Router) {
     if (localStorage.getItem('sesionVeterinaria') !== 'si') {
       this.router.navigate(['/login']);
@@ -39,6 +41,14 @@ export class MascotaComponent {
   cerrarSesion() {
     localStorage.removeItem('sesionVeterinaria');
     this.router.navigate(['/login']);
+  }
+
+  editar(indice: number) {
+    this.indiceEditar = indice;
+    this.nombre = this.mascotas[indice].nombre;
+    this.especie = this.mascotas[indice].especie;
+    this.edad = this.mascotas[indice].edad;
+    this.propietario = this.mascotas[indice].propietario;
   }
 
   guardar() {
@@ -57,22 +67,30 @@ export class MascotaComponent {
       return;
     }
 
-    let nuevoId = 1;
-    for (const mascota of this.mascotas) {
-      if (mascota.id >= nuevoId) {
-        nuevoId = mascota.id + 1;
+    if (this.indiceEditar === -1) {
+      let nuevoId = 1;
+      for (const mascota of this.mascotas) {
+        if (mascota.id >= nuevoId) {
+          nuevoId = mascota.id + 1;
+        }
       }
+
+      const nuevaMascota: Mascota = {
+        id: nuevoId,
+        nombre: this.nombre.trim(),
+        especie: this.especie.trim(),
+        edad: Number(this.edad),
+        propietario: this.propietario.trim()
+      };
+
+      this.mascotas.push(nuevaMascota);
+    } else {
+      this.mascotas[this.indiceEditar].nombre = this.nombre.trim();
+      this.mascotas[this.indiceEditar].especie = this.especie.trim();
+      this.mascotas[this.indiceEditar].edad = Number(this.edad);
+      this.mascotas[this.indiceEditar].propietario = this.propietario.trim();
     }
 
-    const nuevaMascota: Mascota = {
-      id: nuevoId,
-      nombre: this.nombre.trim(),
-      especie: this.especie.trim(),
-      edad: Number(this.edad),
-      propietario: this.propietario.trim()
-    };
-
-    this.mascotas.push(nuevaMascota);
     this.guardarEnLocalStorage();
     this.limpiar();
   }
@@ -82,6 +100,7 @@ export class MascotaComponent {
     this.especie = '';
     this.edad = null;
     this.propietario = '';
+    this.indiceEditar = -1;
   }
 
   guardarEnLocalStorage() {
