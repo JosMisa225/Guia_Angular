@@ -90,6 +90,14 @@ export class TareaComponent {
     this.limpiar();
   }
 
+  eliminar(indice: number) {
+    if (confirm('¿Desea eliminar esta tarea de la agenda?')) {
+      this.tareas.splice(indice, 1);
+      this.guardarEnLocalStorage();
+      this.limpiar();
+    }
+  }
+
   limpiar() {
     this.titulo = '';
     this.descripcion = '';
